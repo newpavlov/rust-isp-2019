@@ -1,39 +1,17 @@
-# CIS 198: Intro to COBOL #
-
-![](img/cobol.png)
-
----
-# CIS 198: Intro to COBOL #
-
-- Designed in 1959 (57 years ago!)
-- We will be using the COBOL2014 standard.
-
-```cobol
-IDENTIFICATION DIVISION.
-PROGRAM-ID. hello-world.
-PROCEDURE DIVISION.
-    DISPLAY "Hello, world!"
-    .
-```
-
----
-# CIS 198: Rust Programming #
+# Lecture 01: Hello, Rust! #
 
 ![](img/rust.png)
-
----
-# Lecture 00: Hello, Rust! #
-
-![](img/ferris.png)
-
-##### This lecture online:
-###### [GitHub One-Page View](https://github.com/cis198-2016s/slides/blob/gh-pages/00/content.md) &bull; [Slide View](http://cis198-2016s.github.io/slides/00/)
+Based on: [CIS 198 slides](https://github.com/cis198-2016s/slides)
+Artyom Pavlov, 2019.
 
 ---
 ## Overview ##
 
+
 "Rust is a systems programming language that runs blazingly fast, prevents
 nearly all segfaults, and guarantees thread safety." &ndash;
+[prev.rust-lang.org](https://prev.rust-lang.org/)
+"Empowering everyone to build reliable and efficient software. " &ndash;
 [rust-lang.org](https://www.rust-lang.org/)
 
 ---
@@ -83,17 +61,16 @@ Rust is:
 ### Release Model
 
 - Rust has a new stable release every six weeks
+- Additionally Rust has 3-year edition releases
 - Nightly builds are available, well, nightly
-- Current stable: Rust 1.5
-- Rust 1.6 will be out tomorrow (1/21)!
-    - This is the version we'll be using in this class
+- Current stable: Rust 1.31 (2018 edition)
 - Train model:
 
 Date | Stable | Beta | Nightly
 --- | --- | --- | ---
-2015-12-10 | 🚂 1.5 | 🚆 1.6 | 🚝 1.7
-2016-01-21 | 🚆 1.6 | 🚝 1.7 | 🚈 1.8
-2016-03-03 | 🚝 1.7 | 🚈 1.8 | 🚅 1.9
+2018-09-13 | 🚂 1.29 | 🚆 1.30 | 🚝 1.31
+2016-10-25 | 🚆 1.30 | 🚝 1.31 | 🚈 1.32
+2016-12-06 | 🚝 1.31 | 🚈 1.32 | 🚅 1.33
 
 ---
 ### Development
@@ -109,14 +86,17 @@ Date | Stable | Beta | Nightly
 
 ![](img/rust-in-production.png)
 
+[Friends of Rust](https://prev.rust-lang.org/en-US/friends.html)
+
 ---
 ### Big Rust Projects
 
 - [Servo](https://github.com/servo/servo)
 - [Piston](https://github.com/PistonDevelopers/piston)
-- [MIO](https://github.com/carllerche/mio)
-- [nickel.rs](http://nickel.rs/)
-- [iron](https://github.com/iron/iron)
+- [MaidSafe](https://maidsafe.net/)
+- [MIO](https://github.com/carllerche/mio) and [tokio](https://github.com/tokio-rs/tokio)
+- [Redox](https://www.redox-os.org/)
+- [ripgrep](https://github.com/BurntSushi/ripgrep)
 - [lalrpop](https://github.com/nikomatsakis/lalrpop)
 - [cargo](https://github.com/rust-lang/cargo)
 - [Rust itself!](https://github.com/rust-lang/rust/)
@@ -124,15 +104,11 @@ Date | Stable | Beta | Nightly
 ---
 ## Administrivia
 
-- 8-9 homeworks (50%), final project (40%) (may change)
-- Participation (10%)
-- Weekly Rust lecture: Wed. 4:30-6:00pm, Towne 321
-- Mini-Course lecture: Tue. 6:00-7:30pm, Berger Auditorium
-- [Piazza](https://piazza.com/class/iiksjduyiy773s)
-    - We will be using Piazza for announcements; make sure you have gotten emails!
-- Consult [the website](http://cis198-2016s.github.io/) for the schedule,
-  slides, and homework.
-- Class source material generally hosted on [GitHub](https://github.com/cis198-2016s/).
+- 5 lectures with homeworks.
+- Final project can be group (up to 5 people) or individual.
+- Pass/fail mark will be decided based on a final project.
+- You can ask questions in Canvas chat.
+- Class source material generally hosted on [GitHub](https://github.com/newpavlov/rust-isp-2019).
     - Corrections welcome via pull request/issue!
 - Course is in development - give us feedback!
 
@@ -158,7 +134,7 @@ Check the website or Google calendar for the up-to-date schedule.
 - Students start the semester with a total of 5 late days, which provide an
   extra 24 hours each. You may use up to 2 late days on an assignment.
   - If (and only if) you submit an assignment more than 2 days late or are out
-    of late days, there is a 20% penalty per day beyond the late day extension. 
+    of late days, there is a 20% penalty per day beyond the late day extension.
 
 ---
 ### Helpful Links ##
