@@ -652,7 +652,8 @@ match x {
         println!("two fish");
         println!("two fish");
     },  // <- comma optional when using braces
-    3 | 4 => println!("three or four, dunno"), // we can use several patterns
+    // we can match several patterns in one arm
+    3 | 4 => println!("three or four, dunno"),
     _ => println!("no fish for you"), // "otherwise" case
 }
 ```
@@ -667,14 +668,17 @@ match x {
 ```rust
 let x = 3;
 let y = -3;
+let q = 10;
 
-match (x, y) {
-    (1, 1) => println!("one"),
-    (2, j) => println!("two, {}", j),
-    (_, 3) => println!("three"),
-    (i, j) if i > 5 && j < 0 => println!("On guard!"),
-    (_, _) => println!(":<"),
-}
+let s = match (x, y) {
+    (1, 1) => "one".to_string(),
+    (2, j) => format!("two, {}", j),
+    (_, 3) => "three".to_string(),
+    (i, j) if i > 5 && j < 0 => "On guard!".to_string(),
+    // NB: note that we do not test x == 10 here!
+    (q, k) => format!("???: {} {}", q, k),
+};
+println!("{}", s);
 ```
 
 - The matched expression can be any expression (l-value), including tuples and function calls.
