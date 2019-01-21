@@ -1861,3 +1861,10 @@ impl<'a, 'b> Foo<'a, 'b> {
   }
 }
 ```
+
+
+---
+## Exercises/homework
+- Solve "Ownership", "Shared borrows", "Mutable borrows", "Structs and such" exercises from: http://www.rust-tutorials.com/exercises/
+- Read The Rust Programming Language book: https://doc.rust-lang.org/book/
+- Check examples in the Rust By Example book: https://doc.rust-lang.org/rust-by-example/
