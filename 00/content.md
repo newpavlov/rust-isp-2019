@@ -401,7 +401,7 @@ let x = v2[2]; // 3
       let y = v2[i as usize];
       ```
 
-- Vectors has an extensive stdlib method list, which can be found at the
+- Vectors has an extensive stdlib method list, which can be found in the
   [offical Rust documentation](https://doc.rust-lang.org/stable/std/vec/).
 
 ---
@@ -652,6 +652,19 @@ fn sum(x: Vec<i32>) -> i32 {
 ```
 
 ---
+### `dbg!()`
+
+- A macro for quick and dirty debugging with which you can inspect the value of a given expression.
+- Was added in Rust 1.32.
+
+```rust
+let a = 2;
+let b = dbg!(a * 2) + 1;
+//      ^-- prints: [src/main.rs:2] a * 2 = 4
+assert_eq!(b, 5);
+```
+
+---
 ## Match statements ###
 - `switch` on steroids.
 
@@ -698,6 +711,46 @@ println!("{}", s);
 - You _must_ write an exhaustive match in order to compile.
 - Use `if`-guards to constrain a match to certain conditions.
 - Patterns can get very complex.
+
+---
+## Exercise ###
+
+- Write two functions for calculating Fibonacci numbers.
+- The first function should use `for` loop without recursion.
+- And the second one should use recursion and `match` statement.
+- Reminder: Fibonacci numbers are calculated as `F(0) = 0; F(1) = 1; F(n) = F(n - 1) + F(n - 2)`
+
+
+---
+## Exercise: non-recursive solution###
+```rust
+fn fibonacci(n: u32) -> u64 {
+    if n == 0 { return 0; }
+	let mut sum = 1;
+	let mut last = 0;
+	let mut curr = 1;
+	for _ in 1..n {
+		sum = last + curr;
+		last = curr;
+		curr = sum;
+	}
+	sum
+}
+```
+
+---
+## Exercise: recursive solution###
+```rust
+fn fibonacci_reccursive(n: u32) -> u64 {
+	match n {
+		0     => 0,
+		1 | 2 => 1,
+		3     => 2,
+		// 50    => 12586269025,
+		_     => fibonacci_reccursive(n - 1) + fibonacci_reccursive(n - 2),
+	}
+}
+```
 
 ---
 # Rust Environment & Tools
