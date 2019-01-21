@@ -717,8 +717,9 @@ println!("{}", s);
 
 - Write two functions for calculating Fibonacci numbers.
 - The first function should use `for` loop without recursion.
-- And the second one should use recursion and `match` statement.
+- And the second one should use recursion and `match`.
 - Reminder: Fibonacci numbers are calculated as `F(0) = 0; F(1) = 1; F(n) = F(n - 1) + F(n - 2)`
+- You can use Rust Playground for this exercise.
 
 
 ---
@@ -741,13 +742,13 @@ fn fibonacci(n: u32) -> u64 {
 ---
 ## Exercise: recursive solution###
 ```rust
-fn fibonacci_reccursive(n: u32) -> u64 {
+fn fibonacci(n: u32) -> u64 {
 	match n {
 		0     => 0,
 		1 | 2 => 1,
 		3     => 2,
 		// 50    => 12586269025,
-		_     => fibonacci_reccursive(n - 1) + fibonacci_reccursive(n - 2),
+		_     => fibonacci(n - 1) + fibonacci(n - 2),
 	}
 }
 ```
@@ -787,7 +788,6 @@ fn fibonacci_reccursive(n: u32) -> u64 {
 - Cargo uses the `Cargo.toml` file to declare and manage dependencies and
   project metadata.
     - TOML is a simple format similar to INI.
-- More in your first homework assignments.
 
 ```toml
 [package]
@@ -1557,12 +1557,13 @@ fn main() {
       constructors for `Vec`
 - Methods may not be inherited.
     - Rust structs & enums must be composed instead.
-    - However, traits (coming soon) have basic inheritance.
+    - However, traits (coming soon) cover some of the inheritence functionality.
 
 ---
 ## Patterns
 
-- Use `...` to specify a range of values. Useful for numerics and `char`s.
+- Use `..=` to specify a range of values. Useful for numerics and `char`s.
+- You can encounter `...` which is deprecated variant of `..=`.
 - Use `_` to bind against any value (like any variable binding) and discard the
   binding.
 
@@ -1570,7 +1571,7 @@ fn main() {
 let x = 17;
 
 match x {
-    0 ... 5 => println!("zero through five (inclusive)"),
+    0 ..= 5 => println!("zero through five (inclusive)"),
     _ => println!("You still lose the game."),
 }
 ```
@@ -1590,6 +1591,7 @@ match x {
 
 - And get a mutable reference with `ref mut`.
     - Only if the variable was declared `mut`.
+- Note: with introduction of ["match ergonomics"](https://github.com/rust-lang/rfcs/blob/master/text/2005-match-ergonomics.md) `ref` patterns become much less common.
 
 ```rust
 let mut x = 17;
@@ -1787,9 +1789,7 @@ let s2;
 }
 ```
 
-???
-
-## Live demo!
+- Currently Rust does not support self-referential structs out-of-box.
 
 ---
 ## Lifetimes - `struct`s
