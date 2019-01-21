@@ -91,6 +91,7 @@ Date | Stable | Beta | Nightly
 - Rust is led by the Rust Team, mostly at Mozilla Research.
 - Very active community involvement - on GitHub, Reddit, irc.
     - [Rust Source](https://github.com/rust-lang/rust/)
+    - [Rust Users Forum](https://users.rust-lang.org/)
     - [Rust Internals Forum](https://internals.rust-lang.org/)
     - [/r/rust](http://www.reddit.com/r/rust)
 
@@ -99,7 +100,7 @@ Date | Stable | Beta | Nightly
 
 ![](img/rust-in-production.png)
 
-<p align="center">[Friends of Rust](https://prev.rust-lang.org/en-US/friends.html)</p>
+More companies and organizations can be found in the [Friends of Rust](https://prev.rust-lang.org/en-US/friends.html) page.
 
 ---
 ### Big Rust Projects
@@ -118,9 +119,10 @@ Date | Stable | Beta | Nightly
 ## Administrivia
 
 - 5 lectures with practical exercises.
-- Completing exercises will be given as a homework.
-- Final project can be group (up to 5 people) or individual.
-- Pass/fail mark will be decided based on a final project.
+- Attendance: 50% (10% per lecture)
+- Final project: 50%
+- Passing grade: 60%
+- Final project can be done individual or in a group (up to 5 people).
 - You can ask questions in the Canvas chat or personally (ISR Lab, room 151).
 - Class source material generally hosted on [GitHub](https://github.com/newpavlov/rust-isp-2019).
     - Corrections are welcomed via pull request/issue!
@@ -222,7 +224,7 @@ println!("x = {} is {} than zero", x, y);
 
 - Side note: `"{}"` is Rust's (most basic) string interpolation operator
     - Similar to Python, Ruby, C#, and others; like `printf`'s `"%s"` in C/C++.
-    - `"{:?}"` can be used for debug formating
+    - `"{:?}"` can be used for debug formatting
     - More information: [doc.rust-lang.org/std/fmt/](https://doc.rust-lang.org/std/fmt/)
 
 ---
@@ -290,6 +292,7 @@ let arr2 = [2; 32];   // (array of 32 `2`s)
 
 ```rust
 let arr = [0, 1, 2, 3, 4, 5];
+let val = arr[0];               // val = 0
 let total_slice = &arr;         // Slice all of `arr`
 let total_slice = &arr[..];     // Same, but more explicit
 let partial_slice = &arr[2..5]; // [2, 3, 4]
@@ -305,9 +308,18 @@ let partial_slice = &arr[2..5]; // [2, 3, 4]
 
 ```rust
 let s: &str = "galaxy";
-let s2: String = "galaxy".to_string();
-let s3: String = String::from("galaxy");
+let s2: String = "галактика".to_string();
+let s3: String = String::from("銀漢");
 let s4: &str = &s3;
+```
+
+```rust
+let s1 = "foobar";
+// You can slice strings:
+let s2 = &s1[1..3];
+// But you can't index with []
+// you can use `s1.chars().nth(1).unwrap()` instead
+let s3 = s1[1] // does not work!
 ```
 
 &sup1;`str` is an unsized type, which doesn't have a compile-time known size,
@@ -317,7 +329,7 @@ and therefore cannot exist by itself.
 ### Tuples ###
 - Fixed-size, ordered, heterogeneous lists
 - Index into tuples with `foo.0`, `foo.1`, etc.
-- Can be destructured in `let` bindings
+- Can be destructured for example in `let` bindings
 
 ```rust
 let foo: (i32, char, f64) = (72, 'H', 5.1);
@@ -380,7 +392,7 @@ let v2 = vec![1, 2, 3];
 let x = v2[2]; // 3
 ```
 
-- Like arrays, vectors can be indexed with `[]`.
+- Like arrays and slices, vectors can be indexed and sliced with `[]`.
     - You can't index a vector with an i32/i64/etc.
     - You must use a `usize` because `usize` is guaranteed to be the same size as a pointer.
     - Other integers can be cast to `usize`:
