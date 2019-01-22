@@ -1,6 +1,9 @@
 # Generics & Traits
 
 ### Rust ISP 2019 Lecture 2
+Based on: [CIS 198 slides](https://github.com/cis198-2016s/slides)
+
+Artyom Pavlov, 2019.
 
 ---
 ## Generics
@@ -52,7 +55,7 @@ enum List<T> {
 - To define implementations for structs & enums with generic types, declare the generics at the
     beginning of the `impl` block:
 
-``` rust
+```rust
 impl<T, E> Result<T, E> {
     fn is_ok(&self) -> bool {
         match *self {
@@ -64,7 +67,8 @@ impl<T, E> Result<T, E> {
 ```
 
 - Or with "[match ergonomics](https://github.com/rust-lang/rfcs/blob/master/text/2005-match-ergonomics.md)":
-``` rust
+
+```rust
 match self {
     Result::Ok(_) => true,
     Result::Err(_) => false,
@@ -151,8 +155,8 @@ fn foo<T, U>(x: T, y: U) {
 }
 ```
 
-- But we can't do anything with `x` and `y`, because we don't know anything
-    about type `T` and `U`
+- But we can't do much with `x` and `y`, because we don't know anything
+    about types `T` and `U`
 
 ---
 ## Generics with Trait Bounds
@@ -200,6 +204,7 @@ fn clone_and_compare<T: Clone + Ord>(t1: T, t2: T) -> bool {
 - Only the impl block header needs to specify trait bounds.
     - This is useful if you want to have multiple impls for a struct each with
       different trait bounds
+
 ```rust
 struct Point<T: Add> {
     x: T,
@@ -376,7 +381,7 @@ pub trait Copy: Clone { }
 - Type must be able to be copied by copying bits (`memcpy`).
     - Types that contain references _cannot_ be `Copy`.
 - Marker trait: does not implement any methods, but defines behavior instead.
-- [Documentation](https://doc.rust-lang.org/std/marker/trait.Copy.html).
+- [Documentation](https://doc.rust-lang.org/std/marker/trait.Copy.html)
 
 ---
 ### Debug
@@ -402,7 +407,7 @@ let origin = Point { x: 0, y: 0 };
 println!("The origin is: {:?}", origin);
 // The origin is: Point { x: 0, y: 0 }
 ```
-- [Documentation](https://doc.rust-lang.org/std/fmt/trait.Debug.html).
+- [Documentation](https://doc.rust-lang.org/std/fmt/trait.Debug.html)
 
 ---
 ### Default
@@ -414,6 +419,7 @@ pub trait Default: Sized {
 ```
 - Defines a default value for a type.
 - Often can be derived, but sometimes it has to be implemented explicitly.
+- [Documentation](https://doc.rust-lang.org/std/default/trait.Default.html)
 
 ---
 ### Eq vs. PartialEq
@@ -444,24 +450,6 @@ pub trait Eq: PartialEq<Self> {}
     - (It is also a Marker trait.)
 - For example, in floating point numbers `NaN != NaN`,
     so floating point types implement `PartialEq` but not `Eq`.
-
----
-### Hash
-
-```rust
-pub trait Hash {
-    fn hash<H: Hasher>(&self, state: &mut H);
-
-    fn hash_slice<H: Hasher>(data: &[Self], state: &mut H)
-        where Self: Sized { ... }
-}
-```
-- A hashable type.
-- The `H` type parameter is an abstract hash state used to compute the hash.
-- If you also implement `Eq`, there is an additional, important property:
-```rust
-k1 == k2 -> hash(k1) == hash(k2)
-```
 
 ---
 ### Ord vs. PartialOrd
@@ -499,10 +487,27 @@ pub trait Ord: Eq + PartialOrd<Self> {
 - An order is a total order if it is (for all `a`, `b` and `c`):
   - total and antisymmetric: exactly one of `a < b`, `a == b` or `a > b` is true; and
   - transitive, `a < b` and `b < c` implies `a < c`. The same must hold for both `==` and `>`.
-- When this trait is derived, it produces a lexicographic ordering.
 - For example, for floating point numbers, `NaN < 0 == false` and `NaN >= 0 == false` (cf. IEEE 754-2008 section 5.11).
+- See `std::cmp` [documentation](https://doc.rust-lang.org/std/cmp/index.html) for more information.
 
-&sup1;taken from Rustdocs
+---
+### Hash
+
+```rust
+pub trait Hash {
+    fn hash<H: Hasher>(&self, state: &mut H);
+
+    fn hash_slice<H: Hasher>(data: &[Self], state: &mut H)
+        where Self: Sized { ... }
+}
+```
+- A hashable type.
+- The `H` type parameter is an abstract hash state used to compute the hash.
+- If you also implement `Eq`, there is an additional, important property:
+```rust
+k1 == k2 -> hash(k1) == hash(k2)
+```
+- [Documentation](https://doc.rust-lang.org/std/hash/trait.Hash.html)
 
 ---
 ## Associated Types
@@ -576,8 +581,6 @@ impl Foo for i32 {
     }
 }
 ```
-
-- But this is really bad practice. Avoid if you can!
 
 ---
 ## Trait Scope
@@ -668,7 +671,7 @@ impl Foo for usize {
 ## Trait Objects
 
 - We can call either of these versions of `bar` via static dispatch using any type with bounds `T: Foo`.
-- When this code is compiled, the compiler will insert calls to specialized versions of `bar`
+- When this code is compiled, the compiler will insert calls to specialized versions of `bar` (monomorphization)
     - One function is generated for each implementor of the `Foo` trait.
 
 ```rust
@@ -692,6 +695,8 @@ fn main() {
 - A trait object is something like `Box<Foo>` or `&Foo`
 - The data behind the reference/box must implement the trait `Foo`.
 - The concrete type underlying the trait is erased; it can't be determined.
+- Well, there is ways to downcast a trait object to a concrete type if you really need to,
+    but usually you don't.
 
 ---
 ## Trait Objects
@@ -736,20 +741,19 @@ use_foo(&198i32);
     - Its methods must not have any type parameters
     - Its methods do not require that `Self: Sized`
 
-&sup1;taken from Rustdocs
-
 ---
 ### Addendum: Generics With Lifetime Bounds
 
 - Some generics may have lifetime bounds like `T: 'a`.
 - Semantically, this reads as "Type `T` must live at least as long as the lifetime `'a`."
 - Why is this useful?
-
----
-### Addendum: Generics With Lifetime Bounds
-
 - Imagine you have some collection of type `T`.
 - If you iterate over this collection, you should be able to guarantee that
     everything in it lives as long as the collection.
     - If you couldn't, Rust wouldn't be safe!
 - `std::Iterator` structs usually contain these sorts of constraints.
+
+---
+## Exercise
+
+- Solve "Traits" exercise from: http://www.rust-tutorials.com/exercises/
