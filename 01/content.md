@@ -1094,9 +1094,9 @@ fn box_up_your_closure_and_move_out() -> Box<Fn(i32) -> i32> {
 
 - `&str` is a string slice (like array slice).
 - `"string literals"` are of type `&str`.&sup1;
-- `&str`s are statically-allocated and fixed-size.
-- May not be indexed with `some_str[i]`, as each character may be multiple bytes
-    due to Unicode.
+- `&str`s are statically-allocated and fixed-size. (pointer + length under the hood)
+- May not be indexed with `some_str[i]`, as each character
+    may be multiple bytes due to UTF-8 encoding.
 - Instead, iterate with `chars()`:
     - `for c in "1234".chars() { ... }`
 - As with all Rust references, they have an associated lifetime.
@@ -1110,7 +1110,7 @@ fn box_up_your_closure_and_move_out() -> Box<Fn(i32) -> i32> {
     - Like `Vec`s in that regard.
     - In fact, `String` is just a wrapper over `Vec<u8>`!
 - Cannot be indexed either.
-    - You can select characters with `s.nth(i)`.
+    - You can select characters with `s.chars().nth(i)`.
 - May be coerced into an `&str` by taking a reference to the `String`.
 
 ```rust
@@ -1133,36 +1133,37 @@ let and_s: &str = &s0;
 - A `String` and an `&str` may be concatenated with `+`:
 
 ```rust
-let course_code = "CIS".to_string();
-let course_name = course_code + " 198";
+let course1 = "Rust".to_string();
+let course2 = course1 + " ISP";
 ```
 
 - Concatenating two `String`s requires coercing one to `&str`:
 
 ```rust
-let course_code = String::from("CIS");
-let course_num  = String::from(" 198");
-let course_name = course_code + &course_num;
+let course1 = String::from("Rust");
+let course2  = String::from(" ISP");
+let course3 = course1 + &course2;
 ```
 
 - You can't concatenate two `&str`s.
 
 ```rust
-let course_name = "CIS " + "198"; // Err!
+let course_name = "Rust " + "ISP"; // Err!
 ```
 
 ---
 ## String Conversion
 
-- However, *actually* converting a `String` into an `&str` requires a
-  dereference:
+- `String` can be converted to `&str` via "deref coercions".
+- `std::ops::Deref` trait allows automatic conversions of references,
+    in our case it converts `&String` to `&str`.
 
 ```rust
 use std::net::TcpStream;
 
 TcpStream::connect("192.168.0.1:3000"); // &str
 let addr = "192.168.0.1:3000".to_string();
-TcpStream::connect(&*addr);
+TcpStream::connect(&addr);
 ```
 
 - This doesn't automatically coerce because `TcpStream` doesn't take an argument
@@ -1170,7 +1171,7 @@ TcpStream::connect(&*addr);
     - `TcpStream::connect<A: ToSocketAddr>(addr: A);`
 
 ---
-### Aside: `Deref` Coercions
+### `Deref` Coercions
 
 - Rust's automatic dereferencing behavior works *between* types as well.
 
@@ -1191,19 +1192,22 @@ pub trait Deref {
     may be overkill.
 - `&str` therefore allows you to pass portions of a `String` around, saving
     memory.
-
----
-## `String` & `&str`: Why?
 - Generally, if you want to do more than use string literals, use `String`.
     - You can then lend out `&str`s easily.
+
+```rust
+let s1: &str = "Hello world!";
+let s2: String = s1.to_string();
+let s3: &str = &s2[3..8]; // "lo wo"
+```
 
 ---
 ## `Option<T>`
 
 ```rust
 enum Option<T> {
-    None,
     Some(T),
+    None,
 }
 ```
 
@@ -1308,6 +1312,8 @@ impl<T> Option<T> {
     }
 }
 ```
+
+- Important! Default value passed to `unwrap_or` always gets evaluated.
 
 ---
 ### `Option::unwrap_or_else()`
@@ -1420,12 +1426,12 @@ macro_rules! try {
 ```
 
 ---
-## `try!`
+## `?`
 
-- `try!` is a concise way to implement early returns when encountering errors.
+- `?` is a postfix operator for "bubbling" errors:
 
 ```rust
-let socket1: TcpStream = try!(TcpStream::connect("127.0.0.1:8000"));
+let socket1: TcpStream = TcpStream::connect("127.0.0.1:8000")?;
 
 // Is equivalent to...
 let maybe_socket: Result<TcpStream> =
@@ -1437,8 +1443,9 @@ let socket2: TcpStream =
     };
 ```
 
-- This is actually a _slight_ simplification.
-    - Actual `try!` has some associated trait ~~magic~~logic.
+- Works via (unstable) `Try` trait and can be used with `Option`.
+- Can convert error types using `From` trait.
+- Replaced (no deprcated) `try!` macro.
 
 ---
 ## [Collections](https://doc.rust-lang.org/stable/std/collections/)
@@ -1455,6 +1462,8 @@ let socket2: TcpStream =
 
 - An efficient double-ended `Vec`.
 - Implemented as a ring buffer.
+- The "default" usage of this type as a queue is to use `push_back` to add to the queue, and `pop_front` to remove from the queue.
+- `extend` and `append` push onto the back in this manner, and iterating over VecDeque goes front to back.
 
 ---
 ## `LinkedList<T>`
@@ -1462,6 +1471,7 @@ let socket2: TcpStream =
 - A doubly-linked list.
 - Even if you want this, you probably don't want this.
     - Seriously, did you even read *any* of Gankro's book?
+- Check out "[Learning Rust With Entirely Too Many Linked Lists](https://cglab.ca/~abeinges/blah/too-many-lists/book/)"
 
 ---
 ## `HashMap<K,V>`/`BTreeMap<K,V>`
@@ -1487,28 +1497,26 @@ let socket2: TcpStream =
 - A priority queue implemented with a binary max-heap.
 
 ---
-## Aside: [Rust Nursery](https://github.com/rust-lang-nursery)
+## Aside: semi-official crates
 
 - Useful "stdlib-ish" crates that are community-developed, but not
     official-official.
-- Contains things like:
-    - Bindings to `libc`
-    - A `rand` library
-    - Regex support
-    - Serialization
-    - UUID generation
+- Crates like:
+    - Bindings to `libc`: https://github.com/rust-lang/libc
+    - A `rand` library: https://github.com/rust-random/rand
+    - Regex support: https://github.com/rust-lang/regex
+    - Serialization: https://github.com/serde-rs/serde
+    - UUID generation: https://github.com/uuid-rs/uuid
 
 ---
 ## Iterators
-
-- You've seen these in HW3!
 
 ```rust
 pub trait Iterator {
     type Item;
     fn next(&mut self) -> Option<Self::Item>;
 
-    // More fields omitted
+    // More methods omitted
 }
 ```
 
@@ -1561,8 +1569,7 @@ pub trait IntoIterator where Self::IntoIter::Item == Self::Item {
 }
 ```
 
-- As you did in HW3, you can implement `IntoIterator` on a `&T` to iterate over
-  a collection by reference.
+- You can implement `IntoIterator` on a `&T` to iterate over a collection by reference.
     - Or on `&mut T` to iterate by mutable reference.
 - This allows this syntax:
 
@@ -1571,7 +1578,6 @@ let ones = vec![1, 1, 1, 1, 1, 1];
 
 for one in &ones {
     // Doesn't move any values.
-    // Also, why are you doing this?
 }
 ```
 
@@ -1580,10 +1586,6 @@ for one in &ones {
 
 - Consumers operate on an iterator and return one or more values.
 - There are like a billion of these, so let's look at a few.
-
-<img src="img/consume.png" style="width: 350px;"/>
-
-###### Photo credit: [Hal Hefner](http://halhefner.com/)
 
 ---
 ## Preface: Type Transformations
@@ -1714,6 +1716,13 @@ fn enumerate(self) -> Enumerate<Self>;
 - This iterator returns `(index, value)` pairs.
     - `index` is the `usize` index of `value` in the collection.
 
+```rust
+let data = [6, 1, 3, 9, 1];
+for (i, value) in data.iter().enumerate() {
+    println!("{} {}", i, value);
+}
+```
+
 ---
 ## Iterator Adapters
 
@@ -1784,3 +1793,10 @@ fn cloned<'a, T>(self) -> Cloned<Self>
 
 - There are many more `Iterator` methods we didn't cover.
 - Take a look at [the docs](https://doc.rust-lang.org/std/iter/trait.Iterator.html) for the rest.
+
+---
+## Home assigment
+
+- Review the covered material:
+    - Review The Rust Programming Language book: https://doc.rust-lang.org/book/
+    - Check examples in the Rust By Example book: https://doc.rust-lang.org/rust-by-example/
