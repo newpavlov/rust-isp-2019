@@ -1,6 +1,177 @@
-# Misc: Syntax, Crates, `std`
+# Generics & Traits
 
-### CIS 198 Lecture 7
+### Rust ISP 2019 Lecture 02
+Based on: [CIS 198 slides](https://github.com/cis198-2016s/slides)
+
+Artyom Pavlov, 2019.
+
+---
+## `&T` and `&mut T`
+
+- Your basic, economy-class references.
+- Zero runtime cost; all checks are done at compile time.
+- Not allowed to outlive their associated lifetime.
+    - Can introduce serious lifetime complexity if you're not careful!
+- Use these unless you _actually_ need something more complicated.
+
+---
+## `Box<T>`
+
+- A `Box<T>` is one of Rust's ways of allocating data on the heap.
+- A `Box<T>` owns a `T`, so its pointer is unique - it can't be aliased (only referenced).
+- `Box`es are automatically freed when they go out of scope.
+- Almost the same as unboxed values, but dynamically allocated.
+- Create a `Box` with `Box::new()`.
+
+```rust
+let boxed_five = Box::new(5);
+```
+
+---
+## `Box<T>`
+
+- Pros:
+    - Easiest way to put something on the heap.
+    - Zero-cost abstraction for dynamic allocation.
+    - Shares typical borrowing and move semantics.
+    - Automatic destruction.
+- Cons (ish):
+    - The `T` is strictly owned by the `Box` - only one owner.
+        - This means the particular variable holding the box can't go away
+          until all references are gone - sometimes this won't work out!
+
+---
+## Aside: Box Syntax & Patterns
+
+- It's currently not possible to destructure the `Box` inside the `Option`. :(
+- So you'll have to write code like this:
+
+```rust
+let opt_box: Option<Box<i32>> = Some(Box::new(5));
+
+match opt_box {
+    Some(boxed) => {
+        let unboxed = *boxed;
+        println!("Some {}", unboxed);
+    }
+    None => println!("None :("),
+}
+
+```
+
+---
+## Aside: Box Syntax & Patterns
+
+- But in Nightly Rust, it's possible, thanks to `box` syntax!
+
+```rust
+#![feature(box_syntax, box_patterns)]
+
+let opt_box = Some(box 5);
+
+match opt_box {
+    Some(box unboxed) => println!("Some {}", unboxed),
+    None => println!("None :("),
+}
+```
+
+- This may change before it reaches Stable.
+
+---
+## `std::rc::Rc<T>`
+
+- Want to share a pointer with your friends? Use an `Rc<T>`!
+- A "**R**eference **C**ounted" pointer.
+    - Keeps track of how many aliases exist for the pointer.
+- Call `clone()` on an `Rc` to get a reference.
+    - Increments its reference count.
+    - No data gets copied!
+- When the ref count drops to 0, the value is freed.
+- The `T` can only be mutated when the reference count is 1 😕.
+    - Same as the borrowing rules - there must be only one owner.
+
+```rust
+let mut shared = Rc::new(6);
+{
+    println!("{:?}", Rc::get_mut(&mut shared)); // ==> Some(6)
+}
+let mut cloned = shared.clone(); // ==> Another reference to same data
+{
+    println!("{:?}", Rc::get_mut(&mut shared)); // ==> None
+    println!("{:?}", Rc::get_mut(&mut cloned)); // ==> None
+}
+```
+
+---
+## `std::rc::Arc<T>`
+
+- Mostly equivalent to `Rc<T>`, but uses **A**tomic reference counting.
+- Using atomics is a bit less performant than the usual integers, but allows
+    to safely share data across threads.
+- Compiler enforces usage of `Arc<T>` instead of `Rc<T>` when data is shared
+    between threads. And it's done at compile time!
+
+---
+## `std::rc::Weak<T>`
+
+- Reference counting has weaknesses: if a cycle is created:
+    - A has an `Rc` to B, B has an `Rc` to A - both have count = 1.
+    - They'll never be freed! ~~Eternal imprisonment~~ a memory leak!
+- This can be avoided with _weak references_.
+    - These don't increment the _strong reference_ count.
+    - But that means they aren't always valid!
+- An `Rc` can be downgraded into a `Weak` using `Rc::downgrade()`.
+    - To access it, turn it back into `Rc`: `weak.upgrade() -> Option<Rc<T>>`
+    - Nothing else can be done with `Weak` - upgrading prevents the value from becoming invalid mid-use.
+
+---
+## Strong Pointers vs. Weak Pointers
+
+- When do you use an `Rc` vs. a `Weak`?
+    - Generally, you probably want a strong reference via `Rc`.
+- If your ownership semantics need to convey a notion of possible access to data but no
+    ownership, you might want to use a `Weak`.
+    - Such a structure would also need to be okay with the `Weak` coming up as
+        `None` when upgraded.
+- Any structure with reference cycles may also need `Weak`, to avoid the leak.
+    - Note: `Rc` cycles are difficult to create in Rust, because of mutability rules.
+
+---
+## `std::rc::Rc<T>`
+
+- Pros:
+    - Allows sharing ownership of data.
+- Cons:
+    - Has a (small) runtime cost.
+        - Holds two reference counts (strong and weak).
+        - Must update and check reference counts dynamically.
+    - Reference cycles can leak memory. This can only be resolved by:
+        - Avoiding creating dangling cycles.
+        - Garbage collection (which Rust doesn't have).
+
+---
+## Cells
+
+- A way to wrap data to allow _interior mutability_.
+- An _immutable_ reference allows modifying the contained value!
+- Check documentation for [`std::cell`](https://doc.rust-lang.org/std/cell/index.html) module and types inside it.
+
+---
+## `*const T` & `*mut T`
+
+- C-like raw pointers: they just point... somewhere in memory.
+- No ownership rules.
+- No lifetime rules.
+- Zero-cost abstraction... because there is no abstraction.
+- Requires `unsafe` to be dereferenced.
+    - May eat your laundry if you're not careful.
+- Use these if you're building a low-level structure like `Vec<T>` or for FFI,
+    but not in typical code.
+    - Can be useful for manually avoiding runtime costs.
+- We won't get to unsafe Rust in this lecture, but for now:
+    - Unsafe Rust is basically C with Rust syntax.
+    - Unsafe means having to manually maintain Rust's assumptions
+      (borrowing, non-nullability, non-undefined memory, correct data aligment, etc.)
 
 ---
 ## `const`
@@ -527,18 +698,5 @@ trait AsRef<T>         { fn as_ref(&self) -> &T; }
 
 &sup2; [Trait std::convert::AsRef](https://doc.rust-lang.org/std/convert/trait.AsRef.html)
 
----
-### Making References
+- Citing the docs: `AsRef` is to be used when wishing to convert to a reference of another type. `Borrow` is more related to the notion of taking the reference. It is useful when wishing to abstract over the type of reference (`&T`, `&mut T`) or allow both the referenced and owned type to be treated in the same manner.
 
-- No! While the have the same definition, `Borrow` carries additional connotations:
-    - "If you are implementing Borrow and both Self and Borrowed implement Hash, Eq, and/or Ord, they must produce the same result."&sup1; &sup2;
-- Borrow has a blanket implementation:
-    - `impl<T> Borrow<T> for T`: you can always convert `T` to `&T`.
-- `AsRef` actually has its own blanket implementation:
-    - `impl<'a, T, U> AsRef<U> for &'a T where T: AsRef<U>`
-    - For all `T`, if `T` implements `AsRef`, `&T` also implements `AsRef`.
-- All this means you usually want to implement `AsRef`.
-
-&sup1; [Trait std::borrow::Borrow](https://doc.rust-lang.org/std/borrow/trait.Borrow.html)
-
-&sup2; [aturon on Borrow vs AsMut](https://github.com/rust-lang/rust/issues/24140#issuecomment-90626264)
