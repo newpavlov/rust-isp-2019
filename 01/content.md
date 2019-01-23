@@ -1561,9 +1561,10 @@ let values = vec![1, 2, 3, 4, 5];
 ## `IntoIterator`
 
 ```rust
-pub trait IntoIterator where Self::IntoIter::Item == Self::Item {
+pub trait IntoIterator {
     type Item;
-    type IntoIter: Iterator;
+
+    type IntoIter: Iterator<Item=Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter;
 }
