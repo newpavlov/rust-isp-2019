@@ -84,8 +84,7 @@ match opt_box {
 - A "**R**eference **C**ounted" pointer.
     - Keeps track of how many aliases exist for the pointer.
 - Call `clone()` on an `Rc` to get a reference.
-    - Increments its reference count.
-    - No data gets copied!
+    - Increments its reference count. No data gets copied!
 - When the ref count drops to 0, the value is freed.
 - The `T` can only be mutated when the reference count is 1 😕.
     - Same as the borrowing rules - there must be only one owner.
