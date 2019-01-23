@@ -1,6 +1,6 @@
 # Generics & Traits
 
-### Rust ISP 2019 Lecture 2
+### Rust ISP 2019 Lecture 01
 Based on: [CIS 198 slides](https://github.com/cis198-2016s/slides)
 
 Artyom Pavlov, 2019.
