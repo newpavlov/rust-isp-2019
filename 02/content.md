@@ -694,9 +694,7 @@ trait AsRef<T>         { fn as_ref(&self) -> &T; }
 
 - So... they're exactly the same?
 
-&sup1; [Trait std::borrow::Borrow](https://doc.rust-lang.org/std/borrow/trait.Borrow.html)
-
-&sup2; [Trait std::convert::AsRef](https://doc.rust-lang.org/std/convert/trait.AsRef.html)
+&sup1; [Trait std::borrow::Borrow](https://doc.rust-lang.org/std/borrow/trait.Borrow.html) &sup2; [Trait std::convert::AsRef](https://doc.rust-lang.org/std/convert/trait.AsRef.html)
 
 - Citing the docs: `AsRef` is to be used when wishing to convert to a reference of another type. `Borrow` is more related to the notion of taking the reference. It is useful when wishing to abstract over the type of reference (`&T`, `&mut T`) or allow both the referenced and owned type to be treated in the same manner.
 
