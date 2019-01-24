@@ -355,3 +355,160 @@ fn main() {
     println!("deserialized = {:?}", deserialized);
 }
 ```
+
+
+---
+## Networking
+
+---
+### Sockets
+
+- Most of this section is preface.
+- We're not actually going to cover most of what's in it directly.
+
+---
+### Sockets
+
+- A basic way to send data over the network.
+    - Not to be confused with IPC sockets, which are a Unix thing.
+- Abstractly, a socket is just a channel that can send and/or receive data over
+    some network.
+- Many layers of socket-programming providers:
+    - Operating system-provided system calls.
+    - Low-level/low-abstraction programming language standard library.
+    - Higher-level networking libraries or libraries handling a specific
+      protocol (e.g. HTTP).
+- Usually, you won't use sockets directly unless you want to do some
+    low-level networking.
+- Two general types: datagram & stream.
+
+---
+### Datagram Sockets (UDP)
+
+- **U**ser **D**atagram **P**rotocol sockets
+- Stateless: no connection to establish with another network device.
+    - Simply send data to a destination IP and port, and assume they're
+        listening.
+- "At least once" delivery.
+    - Packets are not guaranteed to be delivered in order.
+    - Packets may be received more than once.
+- Traditionally implement two methods:
+    - send_to(addr) -- sends data over the socket to the specified address
+    - recv_from() -- listens for data being sent to the socket
+
+---
+### `std::net::UdpSocket`
+
+```rust
+// Try to bind a UDP socket
+let mut socket = try!(UdpSocket::bind("127.0.0.1:34254"));
+
+// Try to receive data from the socket we've bound
+let mut buf = [0; 10];
+let (amt, src) = try!(socket.recv_from(&mut buf));
+
+// Send a reply to the socket we just received data from
+let buf = &mut buf[..amt];
+buf.reverse();
+try!(socket.send_to(buf, &src));
+
+// Close the socket
+drop(socket);
+```
+
+&sup1;Taken from the Rust docs.
+
+---
+### Stream Sockets (TCP)
+
+- "This is where the drugs kick in" - Matt Blaze on TCP sockets
+- **T**ransmission **C**ontrol **P**rotocol sockets
+- Stateful: require a connection to be established and acknowledged between two
+    clients (using SYN packet).
+
+    - Connection must also be explicitly closed.
+- Packets are delivered in-order, exactly once.
+    - Achieved via packet sequence numbers.
+- Packets have delivery acknowledgement (ACK packet).
+- Generally two types of TCP socket:
+    - TCP listeners: listen for data
+    - TCP streams: send data
+
+---
+### `std::net::TcpStream`
+
+- A TCP stream between a local socket and a remote socket.
+
+```rust
+// Create a TCP connection
+let mut stream = TcpStream::connect("127.0.0.1:34254").unwrap();
+
+// Uses std::io::{Read, Write}
+
+// Try to write a byte to the stream
+let write_result = stream.write(&[1]);
+
+// Read from the stream into buf
+let mut buf = [0; 128];
+let read_result = stream.read(&mut buf);
+
+// ...
+// Socket gets automatically closed when it goes out of scope
+```
+
+---
+### `std::net::TcpListener`
+
+- A TCP socket server.
+
+```rust
+let listener = TcpListener::bind("127.0.0.1:80").unwrap();
+
+fn handle_client(stream: TcpStream) { /* ... */  }
+
+// Accept connections and process them,
+// spawning a new thread for each one.
+for stream in listener.incoming() {
+    match stream {
+        Ok(stream) => {
+            thread::spawn(move|| {
+                // connection succeeded
+                handle_client(stream)
+            });
+        }
+        Err(e) => { /* connection failed */ }
+    }
+}
+
+// close the socket server
+drop(listener);
+```
+
+---
+### `SocketAddr`
+
+- A socket address representation.
+- May be either IPv4 or IPv6.
+- Easily created using...
+
+---
+### `ToSocketAddrs`
+
+```rust
+pub trait ToSocketAddrs {
+    type Iter: Iterator<Item=SocketAddr>;
+    fn to_socket_addrs(&self) -> Result<Self::Iter>;
+}
+```
+
+- A trait for objects which can be converted into `SocketAddr` values.
+- Methods like `TcpStream::connect(addr: A)` specify that `A: ToSocketAddr`.
+    - This makes it easier to specify what may be converted to a socket
+        address-like object.
+- See the docs for the full specification.
+
+---
+### HTTP
+- Request-response text-based protocol which works on top of TCP.
+- Foundation of the moddern Web.
+- Check-out [arewewebyet.org/](https://www.arewewebyet.org/) for list of crates which can be used for Web development in Rust.
