@@ -1,20 +1,15 @@
 # Community & Contributing
 
-### CIS 198 Lecture 14
-
 ---
 ## Contributing to Rust
 
 - For the final project (or for fun!) you're allowed to contribute to the Rust language project, or
     to several other Rust projects.
-- Read the [contributing guide here][contrib]
+- Read the [contributing guide here](https://github.com/rust-lang/rust/blob/master/CONTRIBUTING.md)
     to get started.
-- Also check out the [issue tracker][issues].
-    - There are 2,288 issues open as of time of writing!
+- Also check out the [issue tracker](https://github.com/rust-lang/rust/issues).
+    - There are 4,568 issues open as of time of writing!
     - Filter by E-Easy, E-Medium, or E-Mentor to find good starting issues.
-
-[contrib]: (https://github.com/rust-lang/rust/blob/master/CONTRIBUTING.md)
-[issues]: (https://github.com/rust-lang/rust/issues)
 
 ---
 ## Contributing to Rust
@@ -57,30 +52,23 @@
     talk to the core team about it first.
     - This is suggested to help you flesh out ideas & make sure an RFC won't get rejected outright.
 - If you think your idea is still worth proposing, write a formal RFC using the template on the RFCs
-    repo, [following the process here][rfcs].
-
-[rfcs]: https://www.rust-lang.org/conduct.html
+    repo, following the process [here](https://github.com/rust-lang/rfcs/blob/master/README.md).
 
 ---
 ### Resources
 
-- [Contributing guide][contrib]
-- [Issue tracker][issues]
-- [/r/rust on Reddit][reddit]
-- [#rust on IRC][irc]
-- [Rust Internals Forum][internals]
-
-[contrib]: (https://github.com/rust-lang/rust/blob/master/CONTRIBUTING.md)
-[issues]: (https://github.com/rust-lang/rust/issues)
-[reddit]: (https://www.reddit.com/r/rust)
-[irc]: (https://client00.chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust)
-[internals]: (http://internals.rust-lang.org/)
+- [Rust Users Forum][(http://users.rust-lang.org/)
+- [Rust Internals Forum][(http://internals.rust-lang.org/)
+- [/r/rust on Reddit](https://www.reddit.com/r/rust)
+- [Discord](https://discord.gg/rust-lang)
+- [#rust on IRC](https://chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust) (also check #rust-beginners)
+- [This Week In Rust](https://this-week-in-rust.org/) (includes "Call for Participation")
 
 ---
 ## Rust Community Projects
 
 - [Servo](https://servo.org/)
-- [Piston](http://www.piston.rs/)
+- [Piston](http://www.piston.rs/) and [ggez](http://ggez.rs/)
 - [Redox](http://www.redox-os.org/)
 - Others
 
@@ -92,11 +80,11 @@
 - [Quick-Start](https://github.com/servo/servo/blob/master/HACKING_QUICKSTART.md) guide.
 
 ---
-### Piston
+### Piston and ggez
 
 - A game engine under development in Rust.
-- [Contributing](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
-- [Quick-Start](https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/getting-started)
+- piston: [Contributing](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md), [Quick-Start](https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/getting-started)
+- ggez: [Contributing](https://github.com/ggez/ggez/blob/master/CONTRIBUTING.md)
 
 ---
 ### Redox
@@ -107,5 +95,5 @@
 ---
 ### Other Projects
 
-- Look at [libs.rs](http://libs.rs/), [crates.fyi](https://crates.fyi/) and
-    [Awesome Rust](https://github.com/kud1ing/awesome-rust) for more ideas.
+- Look at [libs.rs](http://libs.rs/), [Awesome Rust](https://github.com/kud1ing/awesome-rust) and
+    [Not-Yet-Awesome Rust](https://github.com/not-yet-awesome-rust/not-yet-awesome-rust) for more ideas.
